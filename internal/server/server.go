@@ -46,7 +46,7 @@ func (s *Server) getRouter() *chi.Mux {
 
 	// Middleware
 	router.Use(middleware.RequestIDMiddleware)
-	router.Use(middleware.NewLoggingMiddleware(s.logger))
+	router.Use(middleware.NewMonitoringMiddleware(s.cfg.App.Name, s.logger))
 
 	// Profiler
 	router.HandleFunc("/debug/pprof/", pprof.Index)
