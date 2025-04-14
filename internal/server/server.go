@@ -9,6 +9,7 @@ import (
 
 	"github.com/fungicibus/order/config"
 	"github.com/fungicibus/order/internal/logger"
+	"github.com/fungicibus/order/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -43,9 +44,9 @@ func (s *Server) Run(ctx context.Context) error {
 func (s *Server) getRouter() *chi.Mux {
 	router := chi.NewMux()
 
-	// // Middleware
-	// router.Use(s.RequestID)
-	// router.Use(s.TelemetryMiddleware)
+	// Middleware
+	router.Use(middleware.RequestIDMiddleware)
+	router.Use(middleware.NewLoggingMiddleware(s.logger))
 
 	// Profiler
 	router.HandleFunc("/debug/pprof/", pprof.Index)
