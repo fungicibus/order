@@ -1,0 +1,121 @@
+openapi: 3.0.0
+info:
+  title: Fungicibus Order Service API
+  description: API for managing orders
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - id
+        - status
+        - detail
+        - meta
+      properties:
+        id:
+          type: string
+          description: Id of a request
+        status:
+          type: string
+          description: The HTTP status code applicable to this problem, expressed as a string value
+          example: "400"
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+        meta:
+          type: object
+          required:
+            - timestamp
+          properties:
+            timestamp:
+              type: string
+              description: Timestamp of the occurrence of the problem in RFC3339 format
+              example: "2006-01-02T15:04:05Z07:00"
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: "#/components/schemas/CreateOrderItem"
+
+    CreateOrderItem:
+      type: object
+      required:
+        - productId
+        - quantity
+        - timestamp
+      properties:
+        productId: 
+          type: string
+          description: Id of a product
+          example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
+        quantity: 
+          type: integer
+          description: Quantity of a product
+          example: 1
+        timestamp: 
+          type: string
+          description: Timestamp of an order in RFC3339 format
+          example: "2006-01-02T15:04:05"
+        comment: 
+          type: string
+          description: Comment to an order
+          example: "Some comment"
+
+    CreateOrderResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: "#/components/schemas/CreatedOrder"
+
+    CreatedOrder:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateOrderItem' 
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Id of an order
+              example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
+          required:
+            - id
+paths:
+  /orders:
+    post:
+      summary: Create order
+      operationId: CreateOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "200":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrderResponse"
+        "400":
+          description: Request error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
