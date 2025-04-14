@@ -25,7 +25,8 @@ func main() {
 	}
 	cfg.App.Version = version
 
-	log, err := logger.New(cfg, nil)
+	vmLogs := logger.NewVictoriaLogsWriter(cfg.Log.VictoriaUrl)
+	log, err := logger.New(cfg, vmLogs)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to get logger")
 	}
