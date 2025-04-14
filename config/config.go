@@ -26,7 +26,7 @@ type Log struct {
 }
 
 type Server struct {
-	Port         int           `json:"port" env:"PORT"`
+	Port         int           `json:"port" env:"PORT" envDefault:"8081"`
 	ReadTimeout  time.Duration `json:"read_timeout" env:"READ_TIMEOUT" envDefault:"5s"`
 	WriteTimeout time.Duration `json:"write_timeout" env:"WRITE_TIMEOUT" envDefault:"5s"`
 }
