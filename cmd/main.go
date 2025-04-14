@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -12,20 +13,25 @@ import (
 	"github.com/fungicibus/order/internal/server"
 )
 
+var Tag string
+var Commit string
+
 func main() {
-	log := logger.New()
+	version := getVersion()
 
 	cfg, err := config.GetDefault()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to get config")
+		panic(fmt.Errorf("failed to get config: %w", err))
 	}
-	log.SetLevel(cfg.LogLevel)
+	cfg.App.Version = version
 
-	prettyJSON, err := json.MarshalIndent(cfg, "", "    ")
+	log, err := logger.New(cfg, nil)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to marshal config")
+		log.Fatal().Err(err).Msg("failed to get logger")
 	}
-	log.Debug().Msgf("Config: /n%s", string(prettyJSON))
+
+	cfgContent, _ := json.Marshal(cfg)
+	log.Debug().RawJSON("config", cfgContent).Send()
 
 	v1 := v1.New(cfg, log)
 
@@ -43,4 +49,16 @@ func main() {
 
 	<-ctx.Done()
 	server.Shutdown()
+}
+
+func getVersion() string {
+	tag, commit := Tag, Commit
+
+	if Tag == "" {
+		tag = "tag"
+	}
+	if Commit == "" {
+		commit = "commit"
+	}
+	return tag + "-" + commit
 }

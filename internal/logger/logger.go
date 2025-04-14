@@ -1,9 +1,11 @@
 package logger
 
 import (
+	"fmt"
+	"io"
 	"os"
-	"time"
 
+	"github.com/fungicibus/order/config"
 	"github.com/rs/zerolog"
 )
 
@@ -11,15 +13,20 @@ type Logger struct {
 	zerolog.Logger
 }
 
-func New() *Logger {
-	output := zerolog.ConsoleWriter{
-		Out:        os.Stdout,
-		TimeFormat: time.RFC3339,
-		NoColor:    true,
+func New(cfg *config.Config, nonConsoleWriter io.Writer) (*Logger, error) {
+	var writer io.Writer = os.Stdout
+	if nonConsoleWriter != nil {
+		writer = zerolog.MultiLevelWriter(os.Stdout, nonConsoleWriter)
 	}
 
-	logger := zerolog.New(output).With().Timestamp().Caller().Logger()
-	return &Logger{logger}
+	zerolog.MessageFieldName = "_msg"
+	stream := fmt.Sprintf("app=%s,env=%s", cfg.App.Name, cfg.App.Env)
+	logger := zerolog.New(writer).With().
+		Str("_stream", stream).
+		Timestamp().
+		Logger().
+		Level(zerolog.Level(cfg.Log.Level))
+	return &Logger{logger}, nil
 }
 
 func (l *Logger) SetLevel(level int) {
