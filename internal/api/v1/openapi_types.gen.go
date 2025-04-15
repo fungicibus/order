@@ -33,7 +33,7 @@ type CreatedOrder struct {
 	// Comment Comment to an order
 	Comment *string `json:"comment,omitempty"`
 
-	// Id Id of an order
+	// Id Id of created order
 	Id string `json:"id"`
 
 	// ProductId Id of a product
