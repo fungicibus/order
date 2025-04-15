@@ -12,6 +12,8 @@ type Config struct {
 	Log Log `json:"log" envPrefix:"LOG_"`
 
 	Server Server `json:"server" envPrefix:"SERVER_"`
+
+	OpenapiPath string `json:"openapi_path" env:"OPENAPI_PATH"`
 }
 
 type App struct {
