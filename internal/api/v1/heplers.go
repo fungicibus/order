@@ -33,12 +33,13 @@ func (api *API) ReadJSON(w http.ResponseWriter, r *http.Request, dst interface{}
 	return nil
 }
 
-func (api *API) WriteJSON(w http.ResponseWriter, r *http.Request, response any) {
+func (api *API) WriteJSON(w http.ResponseWriter, r *http.Request, response any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		api.WriteError(w, r, WithError(fmt.Errorf("failed to encode response body: %w", err)))
 	}
+	w.WriteHeader(statusCode)
 }
 
 func (api *API) WriteError(w http.ResponseWriter, r *http.Request, opts ...ErrorOption) {

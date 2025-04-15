@@ -10,19 +10,18 @@ import (
 type API struct {
 	cfg    *config.Config
 	logger *logger.Logger
+
+	storage Storage
 }
 
-func New(cfg *config.Config, logger *logger.Logger) *API {
+func New(cfg *config.Config, logger *logger.Logger, storage Storage) *API {
 	return &API{
-		cfg:    cfg,
-		logger: logger,
+		cfg:     cfg,
+		logger:  logger,
+		storage: storage,
 	}
 }
 
 func (api *API) GetHandler() http.Handler {
 	return Handler(api)
-}
-
-func (api *API) GetLogger() *logger.Logger {
-	return api.logger
 }

@@ -11,6 +11,7 @@ import (
 	v1 "github.com/fungicibus/order/internal/api/v1"
 	"github.com/fungicibus/order/internal/logger"
 	"github.com/fungicibus/order/internal/server"
+	"github.com/fungicibus/order/internal/storage"
 )
 
 var Tag string
@@ -34,7 +35,7 @@ func main() {
 	cfgContent, _ := json.Marshal(cfg)
 	log.Debug().RawJSON("config", cfgContent).Send()
 
-	v1 := v1.New(cfg, log)
+	v1 := v1.New(cfg, log, storage.MockStorage{})
 
 	server := server.New(cfg, log, v1.GetHandler())
 
