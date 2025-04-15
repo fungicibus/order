@@ -46,20 +46,35 @@ type CreatedOrder struct {
 	Timestamp string `json:"timestamp"`
 }
 
-// Error defines model for Error.
-type Error struct {
+// ErrorItem defines model for ErrorItem.
+type ErrorItem struct {
 	// Detail A human-readable explanation specific to this occurrence of the problem
 	Detail string `json:"detail"`
 
-	// Id Id of a request
-	Id   string `json:"id"`
-	Meta struct {
-		// Timestamp Timestamp of the occurrence of the problem in RFC3339 format
-		Timestamp string `json:"timestamp"`
-	} `json:"meta"`
+	// Id Identificator of a request
+	Id     string       `json:"id"`
+	Meta   ErrorMeta    `json:"meta"`
+	Source *ErrorSource `json:"source,omitempty"`
 
 	// Status The HTTP status code applicable to this problem, expressed as a string value
 	Status string `json:"status"`
+}
+
+// ErrorMeta defines model for ErrorMeta.
+type ErrorMeta struct {
+	// Timestamp Timestamp of the occurrence of the problem in RFC3339 format
+	Timestamp *string `json:"timestamp,omitempty"`
+}
+
+// ErrorResponse defines model for ErrorResponse.
+type ErrorResponse struct {
+	Errors []ErrorItem `json:"errors"`
+}
+
+// ErrorSource defines model for ErrorSource.
+type ErrorSource struct {
+	// Pointer a JSON Pointer [RFC6901] to the value in the request document that caused the error
+	Pointer string `json:"pointer"`
 }
 
 // CreateOrderJSONRequestBody defines body for CreateOrder for application/json ContentType.
