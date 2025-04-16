@@ -11,9 +11,10 @@ type Config struct {
 	App App `json:"app" envPrefix:"APP_"`
 	Log Log `json:"log" envPrefix:"LOG_"`
 
-	Server Server `json:"server" envPrefix:"SERVER_"`
-
+	Server      Server `json:"server" envPrefix:"SERVER_"`
 	OpenapiPath string `json:"openapi_path" env:"OPENAPI_PATH"`
+
+	Postgres Postgres `json:"postgres" envPrefix:"POSTGRES_"`
 }
 
 type App struct {
@@ -31,6 +32,11 @@ type Server struct {
 	Port         int           `json:"port" env:"PORT" envDefault:"8081"`
 	ReadTimeout  time.Duration `json:"read_timeout" env:"READ_TIMEOUT" envDefault:"5s"`
 	WriteTimeout time.Duration `json:"write_timeout" env:"WRITE_TIMEOUT" envDefault:"5s"`
+}
+
+type Postgres struct {
+	RWDSN string `json:"rw_dsn" env:"RW_DSN"`
+	RODSN string `json:"ro_dsn" env:"RO_DSN"`
 }
 
 func GetDefault() (*Config, error) {

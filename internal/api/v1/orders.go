@@ -25,24 +25,6 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		comment = *request.Data.Comment
 	}
 
-	if request.Data.ProductId == "" {
-		api.WriteError(w, r,
-			WithStatusCode(http.StatusUnprocessableEntity),
-			WithDetail("product_id must not be empty"),
-			WithSourcePointer("/data/product_id"),
-		)
-		return
-	}
-
-	if request.Data.Quantity <= 0 {
-		api.WriteError(w, r,
-			WithStatusCode(http.StatusUnprocessableEntity),
-			WithDetail("quantity must be greater than zero"),
-			WithSourcePointer("/data/quantity"),
-		)
-		return
-	}
-
 	orderTimestamp, err := time.Parse(time.RFC3339, request.Data.Timestamp)
 	if err != nil {
 		api.WriteError(w, r,
@@ -53,10 +35,36 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	products := make([]types.ProductItem, 0, len(request.Data.Products))
+
+	for i, product := range request.Data.Products {
+		if product.Id == "" {
+			api.WriteError(w, r,
+				WithStatusCode(http.StatusUnprocessableEntity),
+				WithDetail("product_id must not be empty"),
+				WithSourcePointer(fmt.Sprintf("/data/products/%d/product_id", i)),
+			)
+			return
+		}
+
+		if product.Quantity <= 0 {
+			api.WriteError(w, r,
+				WithStatusCode(http.StatusUnprocessableEntity),
+				WithDetail("quantity must be greater than zero"),
+				WithSourcePointer(fmt.Sprintf("/data/products/%d/product_id", i)),
+			)
+			return
+		}
+
+		products = append(products, types.ProductItem{
+			ProductId: product.Id,
+			Quantity:  product.Quantity,
+		})
+	}
+
 	order := types.Order{
 		Comment:   comment,
-		ProductId: request.Data.ProductId,
-		Quantity:  request.Data.Quantity,
+		Products:  products,
 		Timestamp: orderTimestamp,
 	}
 	createdId, err := api.storage.CreateOrder(order)
@@ -71,8 +79,7 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	response := CreateOrderResponse{
 		Data: CreatedOrder{
 			Id:        createdId,
-			ProductId: request.Data.ProductId,
-			Quantity:  request.Data.Quantity,
+			Products:  request.Data.Products,
 			Comment:   request.Data.Comment,
 			Timestamp: request.Data.Timestamp,
 		},

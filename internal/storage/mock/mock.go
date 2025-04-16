@@ -1,4 +1,4 @@
-package storage
+package mock
 
 import "github.com/fungicibus/order/internal/types"
 

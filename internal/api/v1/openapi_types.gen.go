@@ -6,13 +6,8 @@ package v1
 // CreateOrderItem defines model for CreateOrderItem.
 type CreateOrderItem struct {
 	// Comment Comment to an order
-	Comment *string `json:"comment,omitempty"`
-
-	// ProductId Id of a product
-	ProductId string `json:"productId"`
-
-	// Quantity Quantity of a product
-	Quantity int `json:"quantity"`
+	Comment  *string       `json:"comment,omitempty"`
+	Products []ProductItem `json:"products"`
 
 	// Timestamp Timestamp of an order in RFC3339 format
 	Timestamp string `json:"timestamp"`
@@ -34,13 +29,8 @@ type CreatedOrder struct {
 	Comment *string `json:"comment,omitempty"`
 
 	// Id Id of created order
-	Id string `json:"id"`
-
-	// ProductId Id of a product
-	ProductId string `json:"productId"`
-
-	// Quantity Quantity of a product
-	Quantity int `json:"quantity"`
+	Id       string        `json:"id"`
+	Products []ProductItem `json:"products"`
 
 	// Timestamp Timestamp of an order in RFC3339 format
 	Timestamp string `json:"timestamp"`
@@ -75,6 +65,15 @@ type ErrorResponse struct {
 type ErrorSource struct {
 	// Pointer a JSON Pointer [RFC6901] to the value in the request document that caused the error
 	Pointer string `json:"pointer"`
+}
+
+// ProductItem defines model for ProductItem.
+type ProductItem struct {
+	// Id Id of a product
+	Id string `json:"id"`
+
+	// Quantity Quantity of a product
+	Quantity int `json:"quantity"`
 }
 
 // CreateOrderJSONRequestBody defines body for CreateOrder for application/json ContentType.
