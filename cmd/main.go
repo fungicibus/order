@@ -4,9 +4,12 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/fungicibus/order/config"
@@ -14,6 +17,7 @@ import (
 	"github.com/fungicibus/order/internal/logger"
 	"github.com/fungicibus/order/internal/server"
 	"github.com/fungicibus/order/internal/storage"
+	"golang.org/x/sync/errgroup"
 )
 
 //go:embed migrations/*.sql
@@ -60,17 +64,23 @@ func main() {
 		srv = server.New(cfg, log, api.GetHandler())
 	}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer cancel()
+	appCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	go func() {
-		err := srv.Run(ctx)
-		if err != nil {
-			log.Fatal().Err(err).Msg("server error")
+	g, gCtx := errgroup.WithContext(appCtx)
+
+	g.Go(func() error {
+		err := srv.Run(gCtx)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			return fmt.Errorf("failed to run server: %w", err)
 		}
-	}()
+		return nil
+	})
 
-	<-ctx.Done()
+	if err := g.Wait(); err != nil {
+		log.Error().Err(err).Msg("service error")
+	}
+
 	srv.Shutdown()
 }
 
