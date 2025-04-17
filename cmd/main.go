@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/fungicibus/order/config"
 	v1 "github.com/fungicibus/order/internal/api/v1"
 	"github.com/fungicibus/order/internal/logger"
 	"github.com/fungicibus/order/internal/server"
-	"github.com/fungicibus/order/internal/storage/mock"
+	"github.com/fungicibus/order/internal/storage"
 )
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
 
 var Tag string
 var Commit string
@@ -35,22 +40,38 @@ func main() {
 	cfgContent, _ := json.Marshal(cfg)
 	log.Debug().RawJSON("config", cfgContent).Send()
 
-	v1 := v1.New(cfg, log, mock.MockStorage{})
+	var srv *server.Server
+	{
+		initCtx, initCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer initCancel()
 
-	server := server.New(cfg, log, v1.GetHandler())
+		postgres, err := storage.New(initCtx, cfg.Postgres)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to init postgres")
+		}
+		if err := postgres.Ping(initCtx); err != nil {
+			log.Fatal().Err(err).Msg("failed to ping postgres")
+		}
+		if err := postgres.MigrationUp(initCtx, embedMigrations); err != nil {
+			log.Fatal().Err(err).Msg("failed to migrate up postgres")
+		}
+
+		api := v1.New(cfg, log, postgres)
+		srv = server.New(cfg, log, api.GetHandler())
+	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
 	go func() {
-		err := server.Run(ctx)
+		err := srv.Run(ctx)
 		if err != nil {
 			log.Fatal().Err(err).Msg("server error")
 		}
 	}()
 
 	<-ctx.Done()
-	server.Shutdown()
+	srv.Shutdown()
 }
 
 func getVersion() string {

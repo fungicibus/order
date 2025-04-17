@@ -35,8 +35,9 @@ type Server struct {
 }
 
 type Postgres struct {
-	RWDSN string `json:"rw_dsn" env:"RW_DSN"`
-	RODSN string `json:"ro_dsn" env:"RO_DSN"`
+	RWDSN       string        `json:"rw_dsn" env:"RW_DSN"`
+	RODSN       string        `json:"ro_dsn" env:"RO_DSN"`
+	PingTimeout time.Duration `json:"ping_timeout" env:"PING_TIMEOUT" envDefault:"5s"`
 }
 
 func GetDefault() (*Config, error) {
