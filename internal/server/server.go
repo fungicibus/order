@@ -18,6 +18,7 @@ import (
 type Server struct {
 	cfg    *config.Config
 	logger *logger.Logger
+	srv    *http.Server
 	v1     http.Handler
 }
 
@@ -37,6 +38,7 @@ func (s *Server) Run(ctx context.Context) error {
 		ReadTimeout:  s.cfg.Server.ReadTimeout,
 		WriteTimeout: s.cfg.Server.WriteTimeout,
 	}
+	s.srv = srv
 
 	s.logger.Info().Msgf("server started on port %d", s.cfg.Server.Port)
 	return srv.ListenAndServe()
@@ -76,7 +78,11 @@ func (s *Server) getRouter() *chi.Mux {
 	return router
 }
 
-func (s *Server) Shutdown() error {
+func (s *Server) Shutdown(ctx context.Context) error {
 	s.logger.Info().Msg("graceful server shutdown")
+	err := s.srv.Shutdown(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to shutdown http server: %w", err)
+	}
 	return nil
 }

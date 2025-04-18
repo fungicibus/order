@@ -77,7 +77,10 @@ func main() {
 		log.Error().Err(err).Msg("service error")
 	}
 
-	if err := srv.Shutdown(); err != nil {
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), cfg.App.ShutdownTimeout)
+	defer shutdownCancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Error().Err(err).Msg("failed to shutdown server")
 	}
 	postgres.Close()
