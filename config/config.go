@@ -18,9 +18,11 @@ type Config struct {
 }
 
 type App struct {
-	Env     string `json:"env" env:"ENV" envDefault:"dev"`
-	Name    string `json:"name" env:"NAME" envDefault:"order"`
-	Version string `json:"version" env:"-"`
+	Env             string        `json:"env" env:"ENV" envDefault:"dev"`
+	Name            string        `json:"name" env:"NAME" envDefault:"order"`
+	Version         string        `json:"version" env:"-"`
+	InitTimeout     time.Duration `json:"init_timeout" env:"INIT_TIMEOUT" envDefault:"10s"`
+	ShutdownTimeout time.Duration `json:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
 }
 
 type Log struct {

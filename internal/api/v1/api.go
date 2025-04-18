@@ -25,3 +25,4 @@ func New(cfg *config.Config, logger *logger.Logger, storage Storage) *API {
 func (api *API) GetHandler() http.Handler {
 	return Handler(api)
 }
+

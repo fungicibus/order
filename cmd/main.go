@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/fungicibus/order/config"
 	v1 "github.com/fungicibus/order/internal/api/v1"
@@ -44,25 +43,22 @@ func main() {
 	cfgContent, _ := json.Marshal(cfg)
 	log.Debug().RawJSON("config", cfgContent).Send()
 
-	var srv *server.Server
-	{
-		initCtx, initCancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer initCancel()
+	initCtx, initCancel := context.WithTimeout(context.Background(), cfg.App.InitTimeout)
+	defer initCancel()
 
-		postgres, err := storage.New(initCtx, cfg.Postgres)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed to init postgres")
-		}
-		if err := postgres.Ping(initCtx); err != nil {
-			log.Fatal().Err(err).Msg("failed to ping postgres")
-		}
-		if err := postgres.MigrationUp(initCtx, embedMigrations); err != nil {
-			log.Fatal().Err(err).Msg("failed to migrate up postgres")
-		}
-
-		api := v1.New(cfg, log, postgres)
-		srv = server.New(cfg, log, api.GetHandler())
+	postgres, err := storage.New(initCtx, cfg.Postgres)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to init postgres")
 	}
+	if err := postgres.Ping(initCtx); err != nil {
+		log.Fatal().Err(err).Msg("failed to ping postgres")
+	}
+	if err := postgres.MigrationUp(initCtx, embedMigrations); err != nil {
+		log.Fatal().Err(err).Msg("failed to migrate up postgres")
+	}
+
+	api := v1.New(cfg, log, postgres)
+	srv := server.New(cfg, log, api.GetHandler())
 
 	appCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -81,7 +77,13 @@ func main() {
 		log.Error().Err(err).Msg("service error")
 	}
 
-	srv.Shutdown()
+	if err := srv.Shutdown(); err != nil {
+		log.Error().Err(err).Msg("failed to shutdown server")
+	}
+	postgres.Close()
+	vmLogs.Close()
+
+	log.Info().Msg("service stopped")
 }
 
 func getVersion() string {

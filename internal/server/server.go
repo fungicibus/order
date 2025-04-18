@@ -76,6 +76,7 @@ func (s *Server) getRouter() *chi.Mux {
 	return router
 }
 
-func (s *Server) Shutdown() {
+func (s *Server) Shutdown() error {
 	s.logger.Info().Msg("graceful server shutdown")
+	return nil
 }
