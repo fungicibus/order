@@ -67,7 +67,7 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		Products:  products,
 		Timestamp: orderTimestamp,
 	}
-	createdId, err := api.storage.CreateOrder(order)
+	createdOrder, err := api.storage.CreateOrder(order)
 	if err != nil {
 		api.WriteError(w, r,
 			WithStatusCode(http.StatusInternalServerError),
@@ -76,12 +76,18 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// send to kafka
+
+	// then asynchronously consume kafka message with confirmed/rejected
+	// when receive message, do notification to user
+
 	response := CreateOrderResponse{
-		Data: CreatedOrder{
-			Id:        createdId,
+		Data: OrderItem{
+			Id:        createdOrder.Id,
 			Products:  request.Data.Products,
 			Comment:   request.Data.Comment,
 			Timestamp: request.Data.Timestamp,
+			Status:    OrderItemStatus(createdOrder.Status),
 		},
 	}
 

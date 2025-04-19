@@ -108,20 +108,48 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/CreatedOrder"
+          $ref: "#/components/schemas/OrderItem"
 
-    CreatedOrder:
+    OrderItem:
       type: object
-      allOf:
-        - $ref: '#/components/schemas/CreateOrderItem' 
-        - type: object
-          properties:
-            id:
-              type: string
-              description: Id of created order
-              example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
-          required:
-            - id
+      required:
+        - id
+        - status
+        - products
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Id of created order
+          example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
+        status:
+          type: string
+          description: Status of created order
+          enum:
+            - pending
+            - rejected
+            - confirmed
+            - cancelled_by_user
+            - cancelled_by_company 
+            - processing
+            - ready_for_shipping
+            - delivering
+            - delivered
+            - ready_for_pickup
+            - complete
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductItem"
+        timestamp: 
+          type: string
+          description: Timestamp of an order in RFC3339 format
+          example: "2006-01-02T15:04:05"
+        comment: 
+          type: string
+          description: Comment to an order
+          example: "Some comment"
+
 paths:
   /orders:
     post:
