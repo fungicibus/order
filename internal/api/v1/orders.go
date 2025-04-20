@@ -2,10 +2,12 @@ package v1
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
 	"github.com/fungicibus/order/internal/types"
+	"github.com/google/uuid"
 )
 
 // Create order
@@ -34,9 +36,26 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+	if orderTimestamp.After(time.Now()) {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnprocessableEntity),
+			WithDetail("timestamp must be in the past"),
+			WithSourcePointer("/data/timestamp"),
+		)
+		return
+	}
+
+	if len(request.Data.Products) == 0 {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnprocessableEntity),
+			WithDetail("products must not be empty"),
+			WithSourcePointer("/data/products"),
+		)
+		return
+	}
 
 	products := make([]types.ProductItem, 0, len(request.Data.Products))
-
+	var orderTotal float32
 	for i, product := range request.Data.Products {
 		if product.Id == "" {
 			api.WriteError(w, r,
@@ -51,23 +70,61 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 			api.WriteError(w, r,
 				WithStatusCode(http.StatusUnprocessableEntity),
 				WithDetail("quantity must be greater than zero"),
-				WithSourcePointer(fmt.Sprintf("/data/products/%d/product_id", i)),
+				WithSourcePointer(fmt.Sprintf("/data/products/%d/quantity", i)),
 			)
 			return
 		}
 
+		// NOTE: allow price=0 for special items
+		if product.Price < 0 {
+			api.WriteError(w, r,
+				WithStatusCode(http.StatusUnprocessableEntity),
+				WithDetail("price must be zero or positive"),
+				WithSourcePointer(fmt.Sprintf("/data/products/%d/price", i)),
+			)
+			return
+		}
+
+		orderTotal += product.Price
+
 		products = append(products, types.ProductItem{
-			ProductId: product.Id,
-			Quantity:  product.Quantity,
+			Id:       product.Id,
+			Quantity: product.Quantity,
+			Price:    product.Price,
 		})
 	}
+	orderTotal = float32(math.Round(float64(orderTotal)*100) / 100)
+
+	// NOTE: allow order_total=0 if order contains only free items
+	if request.Data.OrderTotal < 0 {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnprocessableEntity),
+			WithDetail("order_total must be zero or positive"),
+			WithSourcePointer("/data/order_total"),
+		)
+		return
+	}
+	if request.Data.OrderTotal != orderTotal {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnprocessableEntity),
+			WithDetail("order_total must be equal to sum of all products prices"),
+			WithSourcePointer("/data/order_total"),
+		)
+		return
+	}
+
+	orderID := uuid.NewString()
 
 	order := types.Order{
-		Comment:   comment,
-		Products:  products,
-		Timestamp: orderTimestamp,
+		Id:         orderID,
+		Products:   products,
+		Comment:    comment,
+		Timestamp:  orderTimestamp,
+		Status:     string(Pending),
+		OrderTotal: request.Data.OrderTotal,
 	}
-	createdOrder, err := api.storage.CreateOrder(order)
+
+	err = api.storage.CreateOrder(r.Context(), order)
 	if err != nil {
 		api.WriteError(w, r,
 			WithStatusCode(http.StatusInternalServerError),
@@ -83,11 +140,11 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	response := CreateOrderResponse{
 		Data: OrderItem{
-			Id:        createdOrder.Id,
+			Id:        orderID,
 			Products:  request.Data.Products,
 			Comment:   request.Data.Comment,
 			Timestamp: request.Data.Timestamp,
-			Status:    OrderItemStatus(createdOrder.Status),
+			Status:    Pending,
 		},
 	}
 

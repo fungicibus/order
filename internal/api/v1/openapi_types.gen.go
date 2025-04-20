@@ -21,8 +21,11 @@ const (
 // CreateOrderItem defines model for CreateOrderItem.
 type CreateOrderItem struct {
 	// Comment Comment to an order
-	Comment  *string       `json:"comment,omitempty"`
-	Products []ProductItem `json:"products"`
+	Comment *string `json:"comment,omitempty"`
+
+	// OrderTotal Total price of an order
+	OrderTotal float32       `json:"order_total"`
+	Products   []ProductItem `json:"products"`
 
 	// Timestamp Timestamp of an order in RFC3339 format
 	Timestamp string `json:"timestamp"`
@@ -75,8 +78,11 @@ type OrderItem struct {
 	Comment *string `json:"comment,omitempty"`
 
 	// Id Id of created order
-	Id       string        `json:"id"`
-	Products []ProductItem `json:"products"`
+	Id string `json:"id"`
+
+	// OrderTotal Total price of an order
+	OrderTotal float32       `json:"order_total"`
+	Products   []ProductItem `json:"products"`
 
 	// Status Status of created order
 	Status OrderItemStatus `json:"status"`
@@ -92,6 +98,9 @@ type OrderItemStatus string
 type ProductItem struct {
 	// Id Id of a product
 	Id string `json:"id"`
+
+	// Price Price of a product
+	Price float32 `json:"price"`
 
 	// Quantity Quantity of a product
 	Quantity int `json:"quantity"`

@@ -3,14 +3,16 @@ package types
 import "time"
 
 type Order struct {
-	Id        string
-	Comment   string
-	Timestamp time.Time
-	Products  []ProductItem
-	Status    string
+	Id         string
+	Comment    string
+	Timestamp  time.Time
+	Products   []ProductItem
+	Status     string
+	OrderTotal float32
 }
 
 type ProductItem struct {
-	ProductId string
-	Quantity  int
+	Id       string
+	Quantity int
+	Price    float32
 }

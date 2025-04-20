@@ -1,17 +1,5 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TYPE order_status AS ENUM (
-   'pending',
-   'rejected',
-   'confirmed',
-   'cancelled',
-   'processing',
-   'ready_for_shipping',
-   'delivering',
-   'delivered',
-   'complete'
-);
-
 -- Create Orders table
 CREATE TABLE
    orders (
@@ -19,7 +7,7 @@ CREATE TABLE
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       "timestamp" TIMESTAMP NOT NULL,
       order_total DECIMAL(10, 2) NOT NULL,
-      "status" order_status NOT NULL
+      "status" VARCHAR(40) NOT NULL
    );
 
 -- Create Order_Items table with price column

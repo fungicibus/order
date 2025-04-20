@@ -1,7 +1,11 @@
 package v1
 
-import "github.com/fungicibus/order/internal/types"
+import (
+	"context"
+
+	"github.com/fungicibus/order/internal/types"
+)
 
 type Storage interface {
-	CreateOrder(order types.Order) (types.Order, error)
+	CreateOrder(ctx context.Context, order types.Order) error
 }

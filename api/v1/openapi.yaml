@@ -73,6 +73,7 @@ components:
       required:
         - products
         - timestamp
+        - order_total
       properties:
         products:
           type: array
@@ -82,6 +83,11 @@ components:
           type: string
           description: Timestamp of an order in RFC3339 format
           example: "2006-01-02T15:04:05"
+        order_total: 
+          type: number
+          format: float
+          description: Total price of an order
+          example: 188.88
         comment: 
           type: string
           description: Comment to an order
@@ -92,6 +98,7 @@ components:
       required:
         - id
         - quantity
+        - price
       properties:
         id: 
           type: string
@@ -101,6 +108,11 @@ components:
           type: integer
           description: Quantity of a product
           example: 1
+        price: 
+          type: number
+          format: float
+          description: Price of a product
+          example: 18.88
 
     CreateOrderResponse:
       type: object
@@ -117,6 +129,7 @@ components:
         - status
         - products
         - timestamp
+        - order_total
       properties:
         id:
           type: string
@@ -145,6 +158,11 @@ components:
           type: string
           description: Timestamp of an order in RFC3339 format
           example: "2006-01-02T15:04:05"
+        order_total: 
+          type: number
+          format: float
+          description: Total price of an order
+          example: 188.88
         comment: 
           type: string
           description: Comment to an order
