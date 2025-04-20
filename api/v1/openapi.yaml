@@ -8,6 +8,12 @@ servers:
   - url: /api/v1
 
 components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter the API key as a plain string (e.g., "your-api-key")
   schemas:
     # Error
     ErrorResponse:
@@ -177,6 +183,14 @@ components:
           type: string
           description: Comment to an order
           example: "Some comment"
+    
+    AdminGetOrdersResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: "#/components/schemas/OrderItem"
 
 paths:
   /orders:
@@ -208,3 +222,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    
+  /admin/orders:
+    get:
+      summary: Get all orders
+      operationId: AdminGetOrders
+      security:
+        - apiKeyAuth: []
+      responses:
+        "200":
+          description: List of all orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminGetOrdersResponse"
+        "401":
+          description: Unauthorized - Invalid or missing API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      

@@ -4,6 +4,7 @@
 package v1
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -12,6 +13,9 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Get all orders
+	// (GET /admin/orders)
+	AdminGetOrders(w http.ResponseWriter, r *http.Request)
 	// Create order
 	// (POST /orders)
 	CreateOrder(w http.ResponseWriter, r *http.Request)
@@ -20,6 +24,12 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Get all orders
+// (GET /admin/orders)
+func (_ Unimplemented) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Create order
 // (POST /orders)
@@ -35,6 +45,26 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// AdminGetOrders operation middleware
+func (siw *ServerInterfaceWrapper) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, ApiKeyAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AdminGetOrders(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // CreateOrder operation middleware
 func (siw *ServerInterfaceWrapper) CreateOrder(w http.ResponseWriter, r *http.Request) {
@@ -163,6 +193,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/admin/orders", wrapper.AdminGetOrders)
+	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/orders", wrapper.CreateOrder)
 	})

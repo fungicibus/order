@@ -160,3 +160,15 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	api.WriteJSON(w, r, response, http.StatusCreated)
 }
+
+// Get all orders
+// (GET /admin/orders)
+func (api *API) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
+	auth := r.Header.Get("Authorization")
+	if auth != api.cfg.Security.AdminKey {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnauthorized),
+			WithDetail("Authorization token does not match admin's"),
+		)
+	}
+}
