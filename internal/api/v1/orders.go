@@ -171,4 +171,41 @@ func (api *API) AdminGetOrders(w http.ResponseWriter, r *http.Request) {
 			WithDetail("Authorization token does not match admin's"),
 		)
 	}
+
+	orders, err := api.storage.GetOrders(r.Context(), types.GetOrdersFilters{})
+	if err != nil {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusInternalServerError),
+			WithError(fmt.Errorf("failed to get orders: %w", err)),
+		)
+		return
+	}
+
+	responseData := make([]OrderItem, 0, len(orders))
+	for _, order := range orders {
+		products := make([]ProductItem, 0, len(order.Products))
+		for _, product := range order.Products {
+			products = append(products, ProductItem{
+				Id:       product.Id,
+				Quantity: product.Quantity,
+				Price:    product.Price,
+			})
+		}
+
+		responseData = append(responseData, OrderItem{
+			Id:         order.Id,
+			Comment:    &order.Comment,
+			Timestamp:  order.Timestamp.Format(time.RFC3339),
+			Status:     OrderItemStatus(order.Status),
+			OrderTotal: order.OrderTotal,
+			UserId:     order.UserId,
+			Products:   products,
+		})
+	}
+
+	response := AdminGetOrdersResponse{
+		Data: responseData,
+	}
+
+	api.WriteJSON(w, r, response, http.StatusOK)
 }

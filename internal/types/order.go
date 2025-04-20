@@ -17,3 +17,8 @@ type ProductItem struct {
 	Quantity int
 	Price    float32
 }
+
+type GetOrdersFilters struct {
+	UserId  string
+	OrderId string
+}

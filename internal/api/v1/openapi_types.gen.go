@@ -24,7 +24,7 @@ const (
 
 // AdminGetOrdersResponse defines model for AdminGetOrdersResponse.
 type AdminGetOrdersResponse struct {
-	Data OrderItem `json:"data"`
+	Data []OrderItem `json:"data"`
 }
 
 // CreateOrderItem defines model for CreateOrderItem.

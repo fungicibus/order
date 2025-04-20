@@ -190,7 +190,9 @@ components:
         - data
       properties:
         data:
-          $ref: "#/components/schemas/OrderItem"
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
 
 paths:
   /orders:
