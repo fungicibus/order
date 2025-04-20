@@ -122,6 +122,7 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		Timestamp:  orderTimestamp,
 		Status:     string(Pending),
 		OrderTotal: request.Data.OrderTotal,
+		UserId:     request.Data.UserId,
 	}
 
 	err = api.storage.CreateOrder(r.Context(), order)

@@ -5,6 +5,7 @@ CREATE TABLE
    orders (
       order_id CHAR(36) PRIMARY KEY,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      user_id CHAR(36) NOT NULL,
       "timestamp" TIMESTAMP NOT NULL,
       order_total DECIMAL(10, 2) NOT NULL,
       "status" VARCHAR(40) NOT NULL

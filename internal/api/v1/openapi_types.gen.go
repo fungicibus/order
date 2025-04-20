@@ -29,6 +29,9 @@ type CreateOrderItem struct {
 
 	// Timestamp Timestamp of an order in RFC3339 format
 	Timestamp string `json:"timestamp"`
+
+	// UserId Id of an user
+	UserId string `json:"user_id"`
 }
 
 // CreateOrderRequest defines model for CreateOrderRequest.
@@ -89,6 +92,9 @@ type OrderItem struct {
 
 	// Timestamp Timestamp of an order in RFC3339 format
 	Timestamp string `json:"timestamp"`
+
+	// UserId Id of an user
+	UserId string `json:"user_id"`
 }
 
 // OrderItemStatus Status of created order

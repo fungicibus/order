@@ -6,6 +6,7 @@ type Order struct {
 	Id         string
 	Comment    string
 	Timestamp  time.Time
+	UserId     string
 	Products   []ProductItem
 	Status     string
 	OrderTotal float32

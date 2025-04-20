@@ -71,10 +71,15 @@ components:
     CreateOrderItem:
       type: object
       required:
+        - user_id
         - products
         - timestamp
         - order_total
       properties:
+        user_id: 
+          type: string
+          description: Id of an user
+          example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
         products:
           type: array
           items:
@@ -127,6 +132,7 @@ components:
       required:
         - id
         - status
+        - user_id
         - products
         - timestamp
         - order_total
@@ -150,6 +156,10 @@ components:
             - delivered
             - ready_for_pickup
             - complete
+        user_id: 
+          type: string
+          description: Id of an user
+          example: "3a550dd9-c7d4-4c77-a73a-fcd13ce76712"
         products:
           type: array
           items:

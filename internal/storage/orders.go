@@ -10,14 +10,15 @@ import (
 
 func (s *service) CreateOrder(ctx context.Context, order types.Order) error {
 	q := `
-		insert into orders(order_id,"timestamp",order_total,"status")
-		values($1, $2, $3, $4)
+		insert into orders(order_id,"timestamp",user_id,order_total,"status")
+		values($1, $2, $3, $4, $5)
 	`
 	_, err := s.rwPool.Exec(
 		ctx,
 		q,
 		order.Id,
 		order.Timestamp,
+		order.UserId,
 		order.OrderTotal,
 		order.Status,
 	)
