@@ -22,6 +22,15 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if request.Data.UserId == "" {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusUnprocessableEntity),
+			WithDetail("user_id must not be empty"),
+			WithSourcePointer("/data/user_id"),
+		)
+		return
+	}
+
 	comment := ""
 	if request.Data.Comment != nil {
 		comment = *request.Data.Comment
