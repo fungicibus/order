@@ -12,17 +12,18 @@ type API struct {
 	logger *logger.Logger
 
 	storage Storage
+	queue   Queue
 }
 
-func New(cfg *config.Config, logger *logger.Logger, storage Storage) *API {
+func New(cfg *config.Config, logger *logger.Logger, storage Storage, queue Queue) *API {
 	return &API{
 		cfg:     cfg,
 		logger:  logger,
 		storage: storage,
+		queue:   queue,
 	}
 }
 
 func (api *API) GetHandler() http.Handler {
 	return Handler(api)
 }
-

@@ -57,7 +57,7 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to migrate up postgres")
 	}
 
-	api := v1.New(cfg, log, postgres)
+	api := v1.New(cfg, log, postgres, v1.UnimplementedQueue{})
 	srv := server.New(cfg, log, api.GetHandler())
 
 	appCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

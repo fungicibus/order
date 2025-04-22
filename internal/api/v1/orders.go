@@ -143,8 +143,14 @@ func (api *API) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// send to kafka
-
+	err = api.queue.EnqueueOrder(r.Context(), order)
+	if err != nil {
+		api.WriteError(w, r,
+			WithStatusCode(http.StatusInternalServerError),
+			WithError(fmt.Errorf("failed to enqueue order: %w", err)),
+		)
+		return
+	}
 	// then asynchronously consume kafka message with confirmed/rejected
 	// when receive message, do notification to user
 
