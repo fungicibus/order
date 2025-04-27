@@ -16,6 +16,7 @@ type Config struct {
 	Security    Security `json:"security" envPrefix:"SECURITY_"`
 
 	Postgres Postgres `json:"postgres" envPrefix:"POSTGRES_"`
+	Kafka    Kafka    `json:"kafka" envPrefix:"KAFKA_"`
 }
 
 type App struct {
@@ -45,6 +46,14 @@ type Postgres struct {
 	RWDSN       string        `json:"rw_dsn" env:"RW_DSN"`
 	RODSN       string        `json:"ro_dsn" env:"RO_DSN"`
 	PingTimeout time.Duration `json:"ping_timeout" env:"PING_TIMEOUT" envDefault:"5s"`
+}
+
+type Kafka struct {
+	CommitInterval      time.Duration `json:"commit_interval" env:"COMMIT_INTERVAL" envDefault:"5s"`
+	Brokers             []string      `json:"brokers" env:"BROKERS" envSeparator:","`
+	TopicOrderCreated   string        `json:"topic_order_created" env:"TOPIC_ORDER_CREATED"`
+	TopicOrderConfirmed string        `json:"topic_order_confirmed" env:"TOPIC_ORDER_CONFIRMED"`
+	TopicOrderRejected  string        `json:"topic_order_rejected" env:"TOPIC_ORDER_REJECTED"`
 }
 
 func GetDefault() (*Config, error) {
