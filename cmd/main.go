@@ -14,6 +14,7 @@ import (
 	"github.com/fungicibus/order/config"
 	v1 "github.com/fungicibus/order/internal/api/v1"
 	"github.com/fungicibus/order/internal/logger"
+	"github.com/fungicibus/order/internal/queue"
 	"github.com/fungicibus/order/internal/server"
 	"github.com/fungicibus/order/internal/storage"
 	"golang.org/x/sync/errgroup"
@@ -57,7 +58,13 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to migrate up postgres")
 	}
 
-	api := v1.New(cfg, log, postgres, v1.UnimplementedQueue{})
+	clientId := cfg.App.Name + "_" + cfg.App.Env
+	kafka, err := queue.New(cfg.Kafka, log, clientId)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to init kafka")
+	}
+
+	api := v1.New(cfg, log, postgres, kafka)
 	srv := server.New(cfg, log, api.GetHandler())
 
 	appCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
