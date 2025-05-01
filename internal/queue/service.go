@@ -20,7 +20,7 @@ func New(cfg config.Kafka, log *logger.Logger, clientID string) (*service, error
 	svc := &service{
 		cfg: cfg,
 	}
-	sarama.Logger = log
+	sarama.Logger = logger.WtihSource(log, "sarama")
 
 	config := sarama.NewConfig()
 	config.Version = sarama.V3_9_0_0

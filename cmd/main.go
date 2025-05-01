@@ -54,7 +54,7 @@ func main() {
 	if err := postgres.Ping(initCtx); err != nil {
 		log.Fatal().Err(err).Msg("failed to ping postgres")
 	}
-	if err := postgres.MigrationUp(initCtx, embedMigrations); err != nil {
+	if err := postgres.MigrationUp(initCtx, embedMigrations, log); err != nil {
 		log.Fatal().Err(err).Msg("failed to migrate up postgres")
 	}
 
