@@ -30,7 +30,7 @@ func New(cfg *config.Config, nonConsoleWriter io.Writer) (*Logger, error) {
 }
 
 func (l *Logger) SetLevel(level int) {
-	l.Logger = l.Logger.Level(zerolog.Level(level))
+	l.Logger = l.Level(zerolog.Level(level))
 }
 
 func WtihSource(initialLogger *Logger, source string) *Logger {

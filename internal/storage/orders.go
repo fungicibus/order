@@ -39,7 +39,7 @@ func (s *service) CreateOrder(ctx context.Context, order types.Order) error {
 	results := s.rwPool.SendBatch(ctx, batch)
 	defer results.Close()
 
-	for i := 0; i < batch.Len(); i++ {
+	for i := range batch.Len() {
 		_, err := results.Exec()
 		if err != nil {
 			return fmt.Errorf("failed to insert into order_items: batch %d: %w", i, err)

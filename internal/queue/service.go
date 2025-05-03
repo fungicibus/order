@@ -12,18 +12,19 @@ type service struct {
 	cfg config.Kafka
 	log *logger.Logger
 
-	consumerGroup sarama.ConsumerGroup
-	producer      sarama.SyncProducer
+	_        sarama.ConsumerGroup
+	producer sarama.SyncProducer
 }
 
 func New(cfg config.Kafka, log *logger.Logger, clientID string) (*service, error) {
 	svc := &service{
 		cfg: cfg,
+		log: log,
 	}
 	sarama.Logger = logger.WtihSource(log, "sarama")
 
 	config := sarama.NewConfig()
-	config.Version = sarama.V3_9_0_0
+	config.Version = sarama.V4_0_0_0
 	config.ClientID = clientID
 
 	config.Producer.Partitioner = sarama.NewHashPartitioner

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -53,7 +54,7 @@ func (w victoriaLogsWriter) Write(p []byte) (n int, err error) {
 	case w.queue <- p:
 		return len(p), nil
 	case <-time.After(100 * time.Millisecond):
-		return 0, fmt.Errorf("log queue is full, dropping log")
+		return 0, errors.New("log queue is full, dropping log")
 	}
 }
 

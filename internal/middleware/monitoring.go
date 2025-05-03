@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/fungicibus/order/internal/logger"
@@ -54,7 +54,7 @@ func NewMonitoringMiddleware(appVersion string, logger *logger.Logger) func(next
 			next.ServeHTTP(ww, r)
 
 			duration := time.Since(start)
-			statusCode := fmt.Sprintf("%d", ww.Status())
+			statusCode := strconv.Itoa(ww.Status())
 
 			httpRequestsTotal.WithLabelValues(statusCode, r.Method).Inc()
 			httpRequestDuration.WithLabelValues(
