@@ -1,0 +1,155 @@
+version: "2"
+run:
+  go: 1.24.2
+  modules-download-mode: readonly
+  tests: false
+  allow-parallel-runners: true
+  allow-serial-runners: true
+linters:
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - cyclop
+    - decorder
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - errchkjson
+    - exhaustive
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+    - zerologlint
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+  settings:
+    cyclop:
+      # The maximal code complexity to report.
+      max-complexity: 45
+    exhaustive:
+      # Only run exhaustive check on switches with "//exhaustive:enforce" comment.
+      explicit-exhaustive-switch: true
+    funlen:
+      # Checks the number of lines in a function.
+      lines: 200
+      # Checks the number of statements in a function.
+      statements: 100
+    gocognit:
+      # Minimal code complexity to report.
+      min-complexity: 55
+    goconst:
+      # Minimum occurrences of constant string count to trigger issue.
+      min-occurrences: 5
+    gocyclo:
+      # Minimal code complexity to report.
+      min-complexity: 50
+    godox:
+      # Report any comments starting with keywords, this is useful for comments that
+      # might be left in the code accidentally and should be resolved before merging.
+      keywords:
+        - BUG
+        - FIX
+    gosec:
+      excludes:
+        - G115 # Potential integer overflow when converting between integer types
+        - G404 # Use of weak random number generator (math/rand or math/rand/v2 instead of crypto/rand)
+    lll:
+      # Max line length, lines longer will be reported.
+      line-length: 150
+    maintidx:
+      # Show functions with maintainability index lower than N.
+      # A high index indicates better maintainability (it's kind of the opposite of complexity).
+      under: 15
+    nestif:
+      # Minimal complexity of if statements to report.
+      min-complexity: 10
+    perfsprint:
+      # Optimizes into strings concatenation.
+      strconcat: false
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+  settings:
+    goimports:
+      # A list of prefixes, which, if set, checks import paths
+      # with the given prefixes are grouped after 3rd-party packages.
+      local-prefixes:
+        - github.com/fungicibus/order
