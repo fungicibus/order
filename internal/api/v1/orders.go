@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fungicibus/order/internal/types"
 	"github.com/google/uuid"
+
+	"github.com/fungicibus/order/internal/types"
 )
 
 // Create order

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/IBM/sarama"
+
 	"github.com/fungicibus/order/config"
 	"github.com/fungicibus/order/internal/logger"
 )
@@ -21,7 +22,7 @@ func New(cfg config.Kafka, log *logger.Logger, clientID string) (*service, error
 		cfg: cfg,
 		log: log,
 	}
-	sarama.Logger = logger.WtihSource(log, "sarama")
+	sarama.Logger = logger.WithSource(log, "sarama")
 
 	config := sarama.NewConfig()
 	config.Version = sarama.V4_0_0_0

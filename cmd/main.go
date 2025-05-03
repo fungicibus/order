@@ -11,13 +11,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/fungicibus/order/config"
 	v1 "github.com/fungicibus/order/internal/api/v1"
 	"github.com/fungicibus/order/internal/logger"
 	"github.com/fungicibus/order/internal/queue"
 	"github.com/fungicibus/order/internal/server"
 	"github.com/fungicibus/order/internal/storage"
-	"golang.org/x/sync/errgroup"
 )
 
 //go:embed migrations/*.sql
@@ -35,8 +36,7 @@ func main() {
 	}
 	cfg.App.Version = version
 
-	vmLogs := logger.NewVictoriaLogsWriter(cfg.Log.VictoriaUrl)
-	log, err := logger.New(cfg, vmLogs)
+	log, err := logger.New(cfg)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to get logger")
 	}
@@ -91,7 +91,6 @@ func main() {
 		log.Error().Err(err).Msg("failed to shutdown server")
 	}
 	postgres.Close()
-	vmLogs.Close()
 
 	log.Info().Msg("service stopped")
 }

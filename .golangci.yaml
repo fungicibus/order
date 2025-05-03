@@ -152,4 +152,4 @@ formatters:
       # A list of prefixes, which, if set, checks import paths
       # with the given prefixes are grouped after 3rd-party packages.
       local-prefixes:
-        - github.com/fungicibus/order
+        - github.com/fungicibus

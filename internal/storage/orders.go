@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fungicibus/order/internal/types"
 	"github.com/jackc/pgx/v5"
+
+	"github.com/fungicibus/order/internal/types"
 )
 
 func (s *service) CreateOrder(ctx context.Context, order types.Order) error {

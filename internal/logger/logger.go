@@ -5,18 +5,22 @@ import (
 	"io"
 	"os"
 
-	"github.com/fungicibus/order/config"
 	"github.com/rs/zerolog"
+
+	"github.com/fungicibus/order/config"
 )
 
 type Logger struct {
 	zerolog.Logger
 }
 
-func New(cfg *config.Config, nonConsoleWriter io.Writer) (*Logger, error) {
+func New(cfg *config.Config, nonConsoleWriters ...io.Writer) (*Logger, error) {
 	var writer io.Writer = os.Stdout
-	if nonConsoleWriter != nil {
-		writer = zerolog.MultiLevelWriter(os.Stdout, nonConsoleWriter)
+	if len(nonConsoleWriters) > 0 {
+		writers := make([]io.Writer, 0, len(nonConsoleWriters)+1)
+		writers = append(writers, os.Stdout)
+		writers = append(writers, nonConsoleWriters...)
+		writer = zerolog.MultiLevelWriter(writers...)
 	}
 
 	zerolog.MessageFieldName = "_msg"
@@ -33,13 +37,14 @@ func (l *Logger) SetLevel(level int) {
 	l.Logger = l.Level(zerolog.Level(level))
 }
 
-func WtihSource(initialLogger *Logger, source string) *Logger {
+func WithSource(initialLogger *Logger, source string) *Logger {
 	loggerWithSource := initialLogger.With().Str("from", source).Logger()
 	return &Logger{
 		Logger: loggerWithSource,
 	}
 }
 
+// Implements goose.Logger
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.Fatalf(format, v)
+	l.Logger.Fatal().Msgf(format, v...)
 }

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fungicibus/order/config"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/fungicibus/order/config"
 )
 
 type service struct {

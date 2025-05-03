@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fungicibus/order/internal/logger"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/fungicibus/order/internal/logger"
 )
 
 func NewMonitoringMiddleware(appVersion string, logger *logger.Logger) func(next http.Handler) http.Handler {
@@ -63,11 +64,7 @@ func NewMonitoringMiddleware(appVersion string, logger *logger.Logger) func(next
 				r.Method,
 			).Observe(duration.Seconds())
 
-			logEvent := logger.Info()
-			if ww.Status() >= 400 {
-				logEvent = logger.Error()
-			}
-			logEvent.
+			logger.Info().
 				Str("requestID", requestID).
 				Str("method", r.Method).
 				Str("path", r.URL.Path).

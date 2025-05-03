@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"github.com/fungicibus/order/config"
-	"github.com/fungicibus/order/internal/logger"
-	"github.com/fungicibus/order/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+
+	"github.com/fungicibus/order/config"
+	"github.com/fungicibus/order/internal/logger"
+	"github.com/fungicibus/order/internal/middleware"
 )
 
 type Server struct {

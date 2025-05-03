@@ -1,4 +1,4 @@
-.PHONY: generate-api-v1 lint
+.PHONY: generate-api-v1 lint goimports gofmt
 
 generate-api-v1:
 	oapi-codegen -package="v1" -generate types -o internal/api/v1/openapi_types.gen.go api/v1/openapi.yaml
@@ -8,3 +8,9 @@ generate-api-v1:
 # Run golangci-lint (https://github.com/golangci/golangci-lint).
 lint:
 	golangci-lint run ./internal/...
+
+goimports:
+	Get-ChildItem -Recurse *.go | ForEach-Object { goimports -local github.com/fungicibus -w $_.FullName }
+
+gofmt:
+	Get-ChildItem -Recurse *.go | ForEach-Object { gofmt -w $_.FullName }

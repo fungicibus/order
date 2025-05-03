@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/IBM/sarama"
+
 	"github.com/fungicibus/order/internal/types"
 )
 
