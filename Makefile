@@ -10,7 +10,10 @@ lint:
 	golangci-lint run ./internal/...
 
 goimports:
-	Get-ChildItem -Recurse *.go | ForEach-Object { goimports -local github.com/fungicibus -w $_.FullName }
+	find . -type f -name "*.go" -exec goimports -local github.com/fungicibus -w {} \;
 
 gofmt:
-	Get-ChildItem -Recurse *.go | ForEach-Object { gofmt -w $_.FullName }
+	find . -type f -name "*.go" -exec gofmt -w {} \;
+
+up:
+	docker compose --file docker/docker-compose.yml up

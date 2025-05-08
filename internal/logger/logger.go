@@ -23,7 +23,6 @@ func New(cfg *config.Config, nonConsoleWriters ...io.Writer) (*Logger, error) {
 		writer = zerolog.MultiLevelWriter(writers...)
 	}
 
-	zerolog.MessageFieldName = "_msg"
 	stream := fmt.Sprintf("app=%s,env=%s", cfg.App.Name, cfg.App.Env)
 	logger := zerolog.New(writer).With().
 		Str("_stream", stream).

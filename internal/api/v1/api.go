@@ -3,6 +3,8 @@ package v1
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/fungicibus/order/config"
 	"github.com/fungicibus/order/internal/logger"
 )
@@ -25,5 +27,7 @@ func New(cfg *config.Config, logger *logger.Logger, storage Storage, queue Queue
 }
 
 func (api *API) GetHandler() http.Handler {
-	return Handler(api)
+	router := chi.NewRouter()
+	router.Get("/ready", api.Ready)
+	return HandlerFromMux(api, router)
 }

@@ -1,0 +1,50 @@
+name: order
+
+services:
+  app:
+    container_name: order
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/ready"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: "3m" # Rotate logs at 3 MB
+        max-file: "3"  # Keep 3 files
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    env_file:
+      - ../.vscode/.env
+
+  vector:
+    image: timberio/vector:0.46.1-alpine
+    container_name: vector
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 50M
+    volumes:
+      - ./configs/vector.yaml:/etc/vector/vector.yaml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - app

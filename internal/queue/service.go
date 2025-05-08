@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/IBM/sarama"
@@ -42,7 +43,7 @@ func New(cfg config.Kafka, log *logger.Logger, clientID string) (*service, error
 	return svc, nil
 }
 
-func (s *service) PingBrokers() error {
+func (s *service) Ping(_ context.Context) error {
 	for _, brokerAddr := range s.cfg.Brokers {
 		broker := sarama.NewBroker(brokerAddr)
 		err := broker.Open(nil)
